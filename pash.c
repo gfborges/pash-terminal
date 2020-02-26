@@ -5,9 +5,10 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/types.h>
+#include <string.h>
 #define clear() printf("\033[H\033[J")
 
-const char* getUserName(){
+const char * getUserName(){
     uid_t uid = geteuid();
     struct passwd *pw = getpwuid(uid);
     if(pw){
@@ -16,16 +17,25 @@ const char* getUserName(){
     return "";
 }
 
-bool read_input(const char * usr){
+bool read_input(const char * usr, char * cmd){
     printf("%s~# ", usr);
-    scanf()
+    scanf("%s", cmd);
+    if( strcmp("exit", cmd) == 0 )
+        return false;
+    return true;
+}
+
+void exec_input(const char * usr, char * cmd){
+    printf("\t%s", cmd);
+    putchar('\n');
 }
 
 int main(){
+   const char * usr = getUserName();
+   char  cmd[100];
    clear();
-   const char  * usr = getUserName();
-   while( read_input(usr *)  ){
-       
+   while( read_input(usr, cmd)  ){
+       exec_input(usr, cmd);
    }
    getchar();
    return 0;
