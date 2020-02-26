@@ -14,19 +14,24 @@ char * usr;
 char cwd[PATH_MAX];
 char _cwd[PATH_MAX] = "~";
 char * envp[] = { (char*)0 };
+char CMD_PATH[] = "/home/gabriel/Documents/pash/bin/";
 
 void _getcwd(){
-    strcpy(_cwd, "~");
     char home[PATH_MAX] = "/home/";
     strcat(home, usr);
     unsigned int home_len = strlen(home);
     getcwd(cwd, sizeof(cwd));
     strcat(cwd, "/");
     if( strncmp(cwd, home, home_len) == 0 ){
+        strcpy(_cwd, "~");
         char path[PATH_MAX];
         strcpy(path, &cwd[home_len]);
         strcat(_cwd, path);
     }
+    else{
+        strcpy(_cwd, cwd);
+    }
+    _cwd[ strlen(_cwd) - 1 ] = '\0';
 }
 
 char * getUserName(){
@@ -67,7 +72,7 @@ void exec_input(char * cmd, char * par[]){
 
     if( pid == 0 ){
         char _cmd[PATH_MAX + 100];
-        strcpy(_cmd, cwd);
+        strcpy(_cmd, CMD_PATH);
         strcat(_cmd, cmd);
         int sucess = execve(_cmd, par, envp);
         if(sucess != 0)
@@ -79,13 +84,29 @@ void exec_input(char * cmd, char * par[]){
     }
 }
 
+int cd(char * cmd, char * par[]){
+    char cwd[PATH_MAX];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/");
+    strcat(cwd, par[1]);
+    if( chdir(par[1]) < 0 ){
+        if( chdir(cwd) < 0 ){
+            perror("chdir");
+        }
+    }
+    return 0;
+}
+
 int main(){
     usr = getUserName();
     char cmd[100], *par[20];
     clear();
     while( read_input(cmd, par) ){
+        if( strcmp(cmd, "cd") == 0 ){
+            cd(cmd, par);
+            continue;
+        }
         exec_input(cmd, par);
     }
-    getchar();
     return 0;
 }
