@@ -39,9 +39,9 @@ char * getUserName(){
 }
 
 void print_header(){
-    printf("%s:", usr); //user name 
+    printf("\e[1m%s:", usr); //user name 
     _getcwd(); // prepare the current dir 
-    printf("%s# ", _cwd); // print current dir
+    printf("%s#\e[0m ", _cwd); // print current dir
 }
 
 bool read_input(char * cmd, char * par[]){
