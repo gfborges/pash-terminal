@@ -13,9 +13,20 @@
 char * usr;
 char cwd[PATH_MAX];
 char _cwd[PATH_MAX] = "~";
-char * genvp[]= {(char *) 0};
-char CMD_PATH[] = "/home/gabriel/Documents/pash/bin/";
+char * PASH_PATH;
 char * NULL_CHAR = (char *) NULL;
+char * PATH;
+char * PWD;
+
+char * get_envp(char * envp[], char * var){
+    int var_len = strlen(var);
+    for(int i = 0; envp[i] != NULL; i++){
+        if( strncmp(envp[i], var, var_len) == 0 ){
+            return envp[i]+ var_len+1;
+        }
+    }
+    return "";
+}
 
 void _getcwd(){
     char home[PATH_MAX] = "/home/";
@@ -72,7 +83,8 @@ void exec_input(char * cmd, char * par[], char * envp[]){
 
     if( pid == 0 ){
         char _cmd[PATH_MAX + 100];
-        strcpy(_cmd, CMD_PATH);
+        strcpy(_cmd, PASH_PATH);
+        strcat(_cmd, "/");
         strcat(_cmd, cmd);
         int sucess = execve(_cmd, par, envp);
         if(sucess != 0)
@@ -81,9 +93,6 @@ void exec_input(char * cmd, char * par[], char * envp[]){
     }
     if( pid > 0 ){
         wait(0);
-        for(int i =0; i< 20; i++){
-            par[i] = NULL_CHAR;
-        }
     }
 }
 
@@ -101,7 +110,9 @@ int cd(char * cmd, char * par[]){
 }
 
 int main(int argc, char * argv[], char * envp[]){
-    usr = getUserName();
+    usr = get_envp(envp, "USER");
+    PATH = get_envp(envp,"PATH");
+    PASH_PATH = get_envp(envp, "PASH_PATH");
     exec_input("clear", argv, envp);
     while(true){
         char cmd[100], *par[20];
