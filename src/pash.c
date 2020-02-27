@@ -13,7 +13,7 @@
 char * usr;
 char cwd[PATH_MAX];
 char _cwd[PATH_MAX] = "~";
-char * envp[] = { (char*)0 };
+char * genvp[]= {(char *) 0};
 char CMD_PATH[] = "/home/gabriel/Documents/pash/bin/";
 char * NULL_CHAR = (char *) NULL;
 
@@ -67,7 +67,7 @@ void read_input(char * cmd, char * par[]){
         exit(0);
 }
 
-void exec_input(char * cmd, char * par[]){
+void exec_input(char * cmd, char * par[], char * envp[]){
     pid_t pid = fork();
 
     if( pid == 0 ){
@@ -100,20 +100,17 @@ int cd(char * cmd, char * par[]){
     return 0;
 }
 
-int main(){
+int main(int argc, char * argv[], char * envp[]){
     usr = getUserName();
-    clear();
+    exec_input("clear", argv, envp);
     while(true){
         char cmd[100], *par[20];
         read_input(cmd, par);
-
         if( strcmp(cmd, "cd") == 0 ){
             cd(cmd, par);
             continue;
         }
-
-        exec_input(cmd, par);
+        exec_input(cmd, par, envp);
     }
-    
     return 0;
 }
