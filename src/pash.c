@@ -15,6 +15,7 @@ char cwd[PATH_MAX];
 char _cwd[PATH_MAX] = "~";
 char * envp[] = { (char*)0 };
 char CMD_PATH[] = "/home/gabriel/Documents/pash/bin/";
+char * NULL_CHAR = (char *) NULL;
 
 void _getcwd(){
     char home[PATH_MAX] = "/home/";
@@ -49,7 +50,7 @@ void print_header(){
     printf("%s#\e[0m ", _cwd); // print current dir
 }
 
-bool read_input(char * cmd, char * par[]){
+void read_input(char * cmd, char * par[]){
     char line[1000], *linetok[100], *pch;
     int i = 0;
     print_header();
@@ -63,8 +64,7 @@ bool read_input(char * cmd, char * par[]){
     for(int j = 0; j <i; j++)
         par[j] = linetok[j];
     if( strcmp("exit", cmd) == 0 )
-        return false;
-    return true;
+        exit(0);
 }
 
 void exec_input(char * cmd, char * par[]){
@@ -81,6 +81,9 @@ void exec_input(char * cmd, char * par[]){
     }
     if( pid > 0 ){
         wait(0);
+        for(int i =0; i< 20; i++){
+            par[i] = NULL_CHAR;
+        }
     }
 }
 
@@ -99,14 +102,18 @@ int cd(char * cmd, char * par[]){
 
 int main(){
     usr = getUserName();
-    char cmd[100], *par[20];
     clear();
-    while( read_input(cmd, par) ){
+    while(true){
+        char cmd[100], *par[20];
+        read_input(cmd, par);
+
         if( strcmp(cmd, "cd") == 0 ){
             cd(cmd, par);
             continue;
         }
+
         exec_input(cmd, par);
     }
+    
     return 0;
 }

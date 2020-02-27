@@ -3,15 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-void ls(char * dir_name){
+void ls(char * dir_name, char * hidden){
     struct dirent ** dir_list;
     int n;
     n = scandir(dir_name, &dir_list, 0, alphasort);
     if( n < 0)
-        perror("scandir");
+        ls(".",hidden);
     else{
         while(n-- > 2){
-            printf("%s\n", dir_list[n]->d_name);
+            if( strncmp(dir_list[n]->d_name,hidden,1) != 0 )
+                printf("%s\n", dir_list[n]->d_name);
             free(dir_list[n]);
         }
         free(dir_list[1]);
@@ -21,10 +22,14 @@ void ls(char * dir_name){
 }
 
 int main(int argc, char * argv[]){
-    if(argc == 1){
-        ls(".");
-        return 0;
+    char hidden[] = ".";
+    int path = 1;
+    for(int i =1; i < argc; i++){
+        if( strcmp(argv[i], "-a") == 0 )
+            hidden[0] = '\0';
+        if( argv[i][0] != '-' )
+            path = i;
     }
-    ls(argv[1]);
+    ls(argv[path], hidden);
     return 0;
 }
