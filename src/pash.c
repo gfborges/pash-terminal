@@ -81,23 +81,27 @@ int read_input(char * cmd, char * par[]){
 
 void exec_input(char * cmd, char * PAR[], int n, char * envp[]){
     char * par[n +1];
-    for(int i =0; i<n;i++){
+    for(int i =0; i<n;i++){ // Passing only the needed parameters
         par[i] = PAR[i];
     }
     par[n] = (char *) NULL;
     pid_t pid = fork();
-
-    if( pid == 0 ){
+    if(pid < 0) // fork failed
+        perror("fork");
+    if( pid == 0 ){ // child process
         char _cmd[PATH_MAX + 100];
-        strcpy(_cmd, PASH_PATH);
-        strcat(_cmd, "/");
-        strcat(_cmd, cmd);
-        int sucess = execve(_cmd, par, envp);
-        if(sucess != 0)
-            puts("faliure!");
-        exit(0);
+        char * pch = strtok(PATH, ":"); // search command at path
+        while(pch != NULL){
+            strcpy(_cmd, pch);
+            strcat(_cmd, "/");
+            strcat(_cmd, cmd);
+            execve(_cmd, par, envp); // executes input
+            pch = strtok(NULL, ":");
+        }
+        perror("execve");
+        exit(0); // make shure child is killed
     }
-    if( pid > 0 ){
+    if( pid > 0 ){ // parent process
         wait(0);
     }
 }
@@ -120,6 +124,7 @@ int main(int argc, char * argv[], char * envp[]){
     PATH = get_envp(envp,"PATH");
     PASH_PATH = get_envp(envp, "PASH_PATH");
     exec_input("clear", argv, 1, envp);
+    // infinite loop for input (exit inside read input)
     while(true){
         char cmd[100], *par[20];
         int n;
