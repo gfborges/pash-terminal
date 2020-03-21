@@ -61,7 +61,7 @@ void print_header(){
     printf("%s#\e[0m ", _cwd); // print current dir
 }
 
-void read_input(char * cmd, char * par[]){
+int read_input(char * cmd, char * par[]){
     char line[1000], *linetok[100], *pch;
     int i = 0;
     print_header();
@@ -76,9 +76,15 @@ void read_input(char * cmd, char * par[]){
         par[j] = linetok[j];
     if( strcmp("exit", cmd) == 0 )
         exit(0);
+    return i;
 }
 
-void exec_input(char * cmd, char * par[], char * envp[]){
+void exec_input(char * cmd, char * PAR[], int n, char * envp[]){
+    char * par[n +1];
+    for(int i =0; i<n;i++){
+        par[i] = PAR[i];
+    }
+    par[n] = (char *) NULL;
     pid_t pid = fork();
 
     if( pid == 0 ){
@@ -113,15 +119,16 @@ int main(int argc, char * argv[], char * envp[]){
     usr = get_envp(envp, "USER");
     PATH = get_envp(envp,"PATH");
     PASH_PATH = get_envp(envp, "PASH_PATH");
-    exec_input("clear", argv, envp);
+    exec_input("clear", argv, 1, envp);
     while(true){
         char cmd[100], *par[20];
-        read_input(cmd, par);
+        int n;
+        n = read_input(cmd, par);
         if( strcmp(cmd, "cd") == 0 ){
             cd(cmd, par);
             continue;
         }
-        exec_input(cmd, par, envp);
+        exec_input(cmd, par, n, envp);
     }
     return 0;
 }
