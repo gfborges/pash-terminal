@@ -62,6 +62,7 @@ void print_header(){
 }
 
 int read_input(char * cmd, char * par[]){
+    // TODO . for woking dir and ~ for $HOME
     char line[1000], *linetok[100], *pch;
     int i = 0;
     print_header();
@@ -91,6 +92,7 @@ void exec_input(char * cmd, char * PAR[], int n, char * envp[]){
     if( pid == 0 ){ // child process
         char _cmd[PATH_MAX + 100];
         char * pch = strtok(PATH, ":"); // search command at path
+        // TODO try  working dir first
         while(pch != NULL){
             strcpy(_cmd, pch);
             strcat(_cmd, "/");
@@ -129,6 +131,7 @@ int main(int argc, char * argv[], char * envp[]){
         char cmd[100], *par[20];
         int n;
         n = read_input(cmd, par);
+        // TODO ?Is this the best way to implement a "cd" command?
         if( strcmp(cmd, "cd") == 0 ){
             cd(cmd, par);
             continue;
